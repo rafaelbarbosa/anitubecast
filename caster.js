@@ -32,7 +32,7 @@
  * initialization success callback
  */
 function onInitSuccess() {
-  appendMessage("init success");
+  
 }
 
 /**
@@ -40,7 +40,7 @@ function onInitSuccess() {
  */
 function onError() {
   console.log("error");
-  appendMessage("error");
+  
 }
 
 /**
@@ -55,7 +55,7 @@ function onSuccess(message) {
  */
 function onStopAppSuccess() {
   console.log('Session stopped');
-  appendMessage('Session stopped');
+  
   //document.getElementById("casticon").src = 'images/cast_icon_idle.png'; 
 }
 
@@ -64,11 +64,10 @@ function onStopAppSuccess() {
  */
 function sessionListener(e) {
   console.log('New session ID: ' + e.sessionId);
-  appendMessage('New session ID:' + e.sessionId);
+  
   session = e;
   if (session.media.length != 0) {
-    appendMessage(
-        'Found ' + session.media.length + ' existing media sessions.');
+    
     onMediaDiscovered('sessionListener', session.media[0]);
   }
   session.addMediaListener(
@@ -82,7 +81,7 @@ function sessionListener(e) {
 function sessionUpdateListener(isAlive) {
   var message = isAlive ? 'Session Updated' : 'Session Removed';
   message += ': ' + session.sessionId;
-  appendMessage(message);
+  
   if (!isAlive) {
     session = null;
     //document.getElementById("casticon").src = 'images/cast_icon_idle.png'; 
@@ -98,7 +97,7 @@ function sessionUpdateListener(isAlive) {
 function receiverListener(e) {
   if( e === 'available' ) {
     console.log("receiver found");
-    appendMessage("receiver found");
+    
 
     var metas = document.getElementsByTagName('meta'); 
     var chromeIconOffSrc = "";
@@ -128,7 +127,7 @@ function receiverListener(e) {
   }
   else {
     console.log("receiver list empty");
-    appendMessage("receiver list empty");
+    
   }
 }
 
@@ -138,7 +137,7 @@ function receiverListener(e) {
  */
 function selectMedia(m) {
   console.log("media selected" + m);
-  appendMessage("media selected" + m);
+  
   currentMediaURL = mediaURLs[m]; 
   //var playpauseresume = document.getElementById("playpauseresume");
   //document.getElementById('thumb').src = mediaThumbs[m];
@@ -159,7 +158,7 @@ function setMyMediaURL(e) {
  */
 function launchApp() {
   console.log("launching app...");
-  appendMessage("launching app...");
+  
   chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
   
 }
@@ -170,7 +169,7 @@ function launchApp() {
  */
 function onRequestSessionSuccess(e) {
   console.log("session success: " + e.sessionId);
-  appendMessage("session success: " + e.sessionId);
+  
   session = e;
   //document.getElementById("casticon").src = 'images/cast_icon_active.png'; 
   session.addUpdateListener(sessionUpdateListener.bind(this));  
@@ -188,7 +187,7 @@ function onRequestSessionSuccess(e) {
  */
 function onLaunchError() {
   console.log("launch error");
-  appendMessage("launch error");
+  
 }
 
 /**
@@ -227,7 +226,7 @@ function loadMedia() {
         
         if (!session) {
       console.log("no session");
-      appendMessage("no session");
+      
       return;
     }
 
@@ -236,7 +235,7 @@ function loadMedia() {
     }
     else {
       console.log("loading..." + currentMediaURL);
-      appendMessage("loading..." + currentMediaURL);
+      
       var mediaInfo = new chrome.cast.media.MediaInfo(currentMediaURL);
     }
     mediaInfo.contentType = 'video/mp4';
@@ -274,7 +273,7 @@ function loadMedia() {
  */
 function onMediaDiscovered(how, media) {
   console.log("new media session ID:" + media.mediaSessionId);
-  appendMessage("new media session ID:" + media.mediaSessionId + ' (' + how + ')');
+  
   currentMedia = media;
   currentMedia.addUpdateListener(onMediaStatusUpdate);
   mediaCurrentTime = currentMedia.currentTime;
@@ -289,7 +288,7 @@ function onMediaDiscovered(how, media) {
  */
 function onMediaError(e) {
   console.log("media error");
-  appendMessage("media error");
+  
   //document.getElementById("casticon").src = 'images/cast_icon_warning.png'; 
 }
 
@@ -341,7 +340,7 @@ function playMedia() {
       mediaCommandSuccessCallback.bind(this,"playing started for " + currentMedia.sessionId),
       onError);
       //playpauseresume.innerHTML = 'Pause';
-      appendMessage("play started");
+      
       
   //}
   /*else {
@@ -350,7 +349,7 @@ function playMedia() {
         mediaCommandSuccessCallback.bind(this,"paused " + currentMedia.sessionId),
         onError);
       //playpauseresume.innerHTML = 'Resume';
-      appendMessage("paused");
+      
     }
     else {
       if( playpauseresume.innerHTML == 'Resume' ) {
@@ -358,7 +357,7 @@ function playMedia() {
           mediaCommandSuccessCallback.bind(this,"resumed " + currentMedia.sessionId),
           onError);
         //playpauseresume.innerHTML = 'Pause';
-        appendMessage("resumed");
+        
         timer = setInterval(updateCurrentTime.bind(this), 1000);
       }
     }*/
@@ -377,7 +376,7 @@ function stopMedia() {
     onError);
   //var playpauseresume = document.getElementById("playpauseresume");
   //playpauseresume.innerHTML = 'Play';
-  appendMessage("media stopped");
+  
   
 }
 
@@ -432,13 +431,13 @@ function muteMedia(cb) {
     //document.getElementById('muteText').innerHTML = 'Unmute media';
     //setMediaVolume(currentVolume, true);
     setReceiverVolume(currentVolume, true);
-    appendMessage("media muted");
+    
   }
   else {
     //document.getElementById('muteText').innerHTML = 'Mute media';
     //setMediaVolume(currentVolume, false);
     setReceiverVolume(currentVolume, false);
-    appendMessage("media unmuted");
+    
   } 
 }
 
@@ -464,7 +463,7 @@ function seekMedia(pos) {
  */
 function onSeekSuccess(info) {
   console.log(info);
-  appendMessage(info);
+  
   setTimeout(function(){progressFlag = 1},1500);
 }
 
@@ -475,27 +474,9 @@ function onSeekSuccess(info) {
  */
 function mediaCommandSuccessCallback(info) {
   console.log(info);
-  appendMessage(info);
+  
 }
 
 
-/**
- * append message to debug message window
- * @param {string} message A message string
- */
-function appendMessage(message) {
-  //var dw = document.getElementById("debugmessage");
-  //dw.innerHTML += '\n' + JSON.stringify(message);
-};
 
-var launchButton = document.createElement('button');
-launchButton.innerText ="Launch";
-launchButton.onclick = launchApp;
 
-var loadMediaButton = document.createElement('button');
-loadMediaButton.innerText ="load Media";
-loadMediaButton.onclick = loadMedia;
-
-document.body.appendChild(launchButton);
-document.body.appendChild(loadMediaButton);
-    console.log("WOW caster");
