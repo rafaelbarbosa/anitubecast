@@ -4,14 +4,7 @@ chromecastScript.src = "https://www.gstatic.com/cv/js/sender/v1/cast_sender.js";
 
 
 var casterScript = document.createElement('script');
-// TODO: add "script.js" to web_accessible_resources in manifest.json
 casterScript.src = chrome.extension.getURL('caster.js');
-
-
-
-
-
-
 
 
 casterScript.onload = function() {
@@ -25,8 +18,6 @@ chromecastScript.onload = function() {
 };
 (document.head||document.documentElement).appendChild(chromecastScript);
 
-
-
 var chromeIconOffMetaTag = document.createElement('meta');
 chromeIconOffMetaTag.name = "chromeIconOffSrc"
 chromeIconOffMetaTag.content = chrome.extension.getURL('cast_off_dark.png');
@@ -36,6 +27,3 @@ var chromeIconOnMetaTag = document.createElement('meta');
 chromeIconOnMetaTag.name = "chromeIconOnSrc"
 chromeIconOnMetaTag.content = chrome.extension.getURL('cast_on_dark.png');
 document.head.appendChild(chromeIconOnMetaTag);
-
-
-//document.body.attributes.chromeIconOnSrc=chrome.extension.getURL('cast_on_dark.png');

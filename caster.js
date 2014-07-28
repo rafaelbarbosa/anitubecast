@@ -1,6 +1,4 @@
-
-
-    function initializeCastApi() {
+function initializeCastApi() {
   // default app ID to the default media receiver app
   // optional: you may change it to your own app ID/receiver
   var applicationID = chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID;
@@ -12,27 +10,19 @@
   chrome.cast.initialize(apiConfig, onInitSuccess, onError);
 };
 
+window['__onGCastApiAvailable'] = function(loaded, errorInfo) {
+  if (loaded) {
+    initializeCastApi();
+  } else {
+    console.log(errorInfo);
+  }
+}
 
-
-
-    window['__onGCastApiAvailable'] = function(loaded, errorInfo) {
-    if (loaded) {
-        initializeCastApi();
-      } else {
-        console.log(errorInfo);
-      }
-    }
-
-    
-
-    
-
-
-    /**
+/**
  * initialization success callback
  */
 function onInitSuccess() {
-  
+
 }
 
 /**
@@ -40,7 +30,7 @@ function onInitSuccess() {
  */
 function onError() {
   console.log("error");
-  
+
 }
 
 /**
@@ -55,8 +45,7 @@ function onSuccess(message) {
  */
 function onStopAppSuccess() {
   console.log('Session stopped');
-  
-  //document.getElementById("casticon").src = 'images/cast_icon_idle.png'; 
+
 }
 
 /**
@@ -64,30 +53,30 @@ function onStopAppSuccess() {
  */
 function sessionListener(e) {
   console.log('New session ID: ' + e.sessionId);
-  
+
   session = e;
   if (session.media.length != 0) {
-    
+
     onMediaDiscovered('sessionListener', session.media[0]);
   }
   session.addMediaListener(
     onMediaDiscovered.bind(this, 'addMediaListener'));
-  session.addUpdateListener(sessionUpdateListener.bind(this));  
+  session.addUpdateListener(sessionUpdateListener.bind(this));
 }
 
 /**
- * session update listener 
+ * session update listener
  */
 function sessionUpdateListener(isAlive) {
   var message = isAlive ? 'Session Updated' : 'Session Removed';
   message += ': ' + session.sessionId;
-  
+
   if (!isAlive) {
     session = null;
     //document.getElementById("casticon").src = 'images/cast_icon_idle.png'; 
     //var playpauseresume = document.getElementById("playpauseresume");
     //playpauseresume.innerHTML = 'Play';
-    
+
   }
 };
 
@@ -95,60 +84,59 @@ function sessionUpdateListener(isAlive) {
  * receiver listener during initialization
  */
 function receiverListener(e) {
-  if( e === 'available' ) {
+  if (e === 'available') {
     console.log("receiver found");
-    
 
-    var metas = document.getElementsByTagName('meta'); 
+
+    var metas = document.getElementsByTagName('meta');
     var chromeIconOffSrc = "";
-   for (i=0; i<metas.length; i++) { 
-      if (metas[i].getAttribute("name") == "chromeIconOffSrc") { 
-         chromeIconOffSrc =  metas[i].getAttribute("content"); 
-         break;
-      } 
-   } 
+    for (i = 0; i < metas.length; i++) {
+      if (metas[i].getAttribute("name") == "chromeIconOffSrc") {
+        chromeIconOffSrc = metas[i].getAttribute("content");
+        break;
+      }
+    }
 
-    
+
     jwplayer().addButton(
-//This portion is what designates the graphic used for the button
-   chromeIconOffSrc,
-//This portion determines the text that appears as a tooltip
-   "Cast", 
-//This portion designates the functionality of the button itself
-   function() {
-//With the below code, we're grabbing the file that's currently playing
-   launchApp();
- },
-//And finally, here we set the unique ID of the button itself.
-"cast"
-);
+      //This portion is what designates the graphic used for the button
+      chromeIconOffSrc,
+      //This portion determines the text that appears as a tooltip
+      "Cast",
+      //This portion designates the functionality of the button itself
+      function() {
+        //With the below code, we're grabbing the file that's currently playing
+        launchApp();
+      },
+      //And finally, here we set the unique ID of the button itself.
+      "cast"
+    );
 
 
-  }
-  else {
+  } else {
     console.log("receiver list empty");
-    
+
   }
 }
 
 /**
- * select a media URL 
+ * select a media URL
  * @param {string} m An index for media URL
  */
 function selectMedia(m) {
   console.log("media selected" + m);
-  
-  currentMediaURL = mediaURLs[m]; 
+
+  currentMediaURL = mediaURLs[m];
   //var playpauseresume = document.getElementById("playpauseresume");
   //document.getElementById('thumb').src = mediaThumbs[m];
 }
 
 /**
- * enter a media URL 
+ * enter a media URL
  * @param {string} m An media URL
  */
 function setMyMediaURL(e) {
-  if( e.value ) {
+  if (e.value) {
     currentMediaURL = e.value;
   }
 }
@@ -158,28 +146,28 @@ function setMyMediaURL(e) {
  */
 function launchApp() {
   console.log("launching app...");
-  
+
   chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
-  
+
 }
 
 /**
- * callback on success for requestSession call  
+ * callback on success for requestSession call
  * @param {Object} e A non-null new session.
  */
 function onRequestSessionSuccess(e) {
   console.log("session success: " + e.sessionId);
-  
+
   session = e;
   //document.getElementById("casticon").src = 'images/cast_icon_active.png'; 
-  session.addUpdateListener(sessionUpdateListener.bind(this));  
+  session.addUpdateListener(sessionUpdateListener.bind(this));
   if (session.media.length != 0) {
     onMediaDiscovered('onRequestSession', session.media[0]);
   }
   session.addMediaListener(
-  onMediaDiscovered.bind(this, 'addMediaListener'));
+    onMediaDiscovered.bind(this, 'addMediaListener'));
   session.addUpdateListener(sessionUpdateListener.bind(this));
-  loadMedia();  
+  loadMedia();
 }
 
 /**
@@ -187,7 +175,7 @@ function onRequestSessionSuccess(e) {
  */
 function onLaunchError() {
   console.log("launch error");
-  
+
 }
 
 /**
@@ -195,7 +183,7 @@ function onLaunchError() {
  */
 function stopApp() {
   session.stop(onStopAppSuccess, onError);
-  
+
 }
 
 /**
@@ -203,7 +191,7 @@ function stopApp() {
  */
 function loadCustomMedia() {
   var customMediaURL = document.getElementById('customMediaURL').value;
-  if( customMediaURL.length > 0 ) {
+  if (customMediaURL.length > 0) {
     loadMedia(customMediaURL);
   }
 }
@@ -214,56 +202,54 @@ function loadCustomMedia() {
  */
 function loadMedia() {
 
-      jwPlayer.setControls(false);  
-      jwPlayer.stop();
-      if(jwPlayer.getPlaylistItem().sources[1]){
-        mediaURL = jwPlayer.getPlaylistItem().sources[1].file;
-      }
-      else{
-        mediaURL = jwPlayer.getPlaylistItem().file; 
-      }
-        
-        
-        if (!session) {
-      console.log("no session");
-      
-      return;
-    }
-
-    if( mediaURL ) {
-      var mediaInfo = new chrome.cast.media.MediaInfo(mediaURL);
-    }
-    else {
-      console.log("loading..." + currentMediaURL);
-      
-      var mediaInfo = new chrome.cast.media.MediaInfo(currentMediaURL);
-    }
-    mediaInfo.contentType = 'video/mp4';
-    var request = new chrome.cast.media.LoadRequest(mediaInfo);
-    request.autoplay = true;
-    request.currentTime = 0;
-    
-    var payload = {
-      "title:" : "Pupa 02"
-      //"thumb" : mediaThumbs[i]
-    };
-
-    var json = {
-      "payload" : payload
-    };
-
-    request.customData = json;
-
-    session.loadMedia(request,
-      onMediaDiscovered.bind(this, 'loadMedia'),
-      onMediaError);
+  jwPlayer.setControls(false);
+  jwPlayer.stop();
+  if (jwPlayer.getPlaylistItem().sources[1]) {
+    mediaURL = jwPlayer.getPlaylistItem().sources[1].file;
+  } else {
+    mediaURL = jwPlayer.getPlaylistItem().file;
+  }
 
 
-     
+  if (!session) {
+    console.log("no session");
+
+    return;
+  }
+
+  if (mediaURL) {
+    var mediaInfo = new chrome.cast.media.MediaInfo(mediaURL);
+  } else {
+    console.log("loading..." + currentMediaURL);
+
+    var mediaInfo = new chrome.cast.media.MediaInfo(currentMediaURL);
+  }
+  mediaInfo.contentType = 'video/mp4';
+  var request = new chrome.cast.media.LoadRequest(mediaInfo);
+  request.autoplay = true;
+  request.currentTime = 0;
+
+  var payload = {
+    "title:": "Pupa 02"
+    //"thumb" : mediaThumbs[i]
+  };
+
+  var json = {
+    "payload": payload
+  };
+
+  request.customData = json;
+
+  session.loadMedia(request,
+    onMediaDiscovered.bind(this, 'loadMedia'),
+    onMediaError);
+
+
+
 
 
   //mediaURL = "http://lax02.vid.anitu.be/FwYrIrGgyUKassxHfUwWiQ/1404693442/68051.mp4";
-  
+
 
 }
 
@@ -273,13 +259,13 @@ function loadMedia() {
  */
 function onMediaDiscovered(how, media) {
   console.log("new media session ID:" + media.mediaSessionId);
-  
+
   currentMedia = media;
   currentMedia.addUpdateListener(onMediaStatusUpdate);
   mediaCurrentTime = currentMedia.currentTime;
   //playpauseresume.innerHTML = 'Play';
   //document.getElementById("casticon").src = 'images/cast_icon_active.png'; 
-  
+
 }
 
 /**
@@ -288,7 +274,7 @@ function onMediaDiscovered(how, media) {
  */
 function onMediaError(e) {
   console.log("media error");
-  
+
   //document.getElementById("casticon").src = 'images/cast_icon_warning.png'; 
 }
 
@@ -297,7 +283,7 @@ function onMediaError(e) {
  * @param {Object} e A non-null media object
  */
 function onMediaStatusUpdate(isAlive) {
-  if( progressFlag ) {
+  if (progressFlag) {
     //document.getElementById("progress").value = parseInt(100 * currentMedia.currentTime / currentMedia.media.duration);
     //document.getElementById("progress_tick").innerHTML = currentMedia.currentTime;
     //document.getElementById("duration").innerHTML = currentMedia.media.duration;
@@ -317,11 +303,10 @@ function updateCurrentTime() {
     var cTime = currentMedia.getEstimatedTime();
     //document.getElementById("progress").value = parseInt(100 * cTime / currentMedia.media.duration);
     //document.getElementById("progress_tick").innerHTML = cTime;
-  }
-  else {
+  } else {
     //document.getElementById("progress").value = 0;
     //document.getElementById("progress_tick").innerHTML = 0;
-    
+
   }
 };
 
@@ -329,19 +314,19 @@ function updateCurrentTime() {
  * play media
  */
 function playMedia() {
-  if( !currentMedia ) 
+  if (!currentMedia)
     return;
 
-  
+
 
   //var playpauseresume = document.getElementById("playpauseresume");
   //if( playpauseresume.innerHTML == 'Play' ) {
-    currentMedia.play(null,
-      mediaCommandSuccessCallback.bind(this,"playing started for " + currentMedia.sessionId),
-      onError);
-      //playpauseresume.innerHTML = 'Pause';
-      
-      
+  currentMedia.play(null,
+    mediaCommandSuccessCallback.bind(this, "playing started for " + currentMedia.sessionId),
+    onError);
+  //playpauseresume.innerHTML = 'Pause';
+
+
   //}
   /*else {
     if( playpauseresume.innerHTML == 'Pause' ) {
@@ -368,25 +353,25 @@ function playMedia() {
  * stop media
  */
 function stopMedia() {
-  if( !currentMedia ) 
+  if (!currentMedia)
     return;
 
   currentMedia.stop(null,
-    mediaCommandSuccessCallback.bind(this,"stopped " + currentMedia.sessionId),
+    mediaCommandSuccessCallback.bind(this, "stopped " + currentMedia.sessionId),
     onError);
   //var playpauseresume = document.getElementById("playpauseresume");
   //playpauseresume.innerHTML = 'Play';
-  
-  
+
+
 }
 
 /**
  * set media volume
  * @param {Number} level A number for volume level
- * @param {Boolean} mute A true/false for mute/unmute 
+ * @param {Boolean} mute A true/false for mute/unmute
  */
 function setMediaVolume(level, mute) {
-  if( !currentMedia ) 
+  if (!currentMedia)
     return;
 
   var volume = new chrome.cast.Volume();
@@ -403,19 +388,18 @@ function setMediaVolume(level, mute) {
 /**
  * set receiver volume
  * @param {Number} level A number for volume level
- * @param {Boolean} mute A true/false for mute/unmute 
+ * @param {Boolean} mute A true/false for mute/unmute
  */
 function setReceiverVolume(level, mute) {
-  if( !session ) 
+  if (!session)
     return;
 
-  if( !mute ) {
+  if (!mute) {
     session.setReceiverVolumeLevel(level,
       mediaCommandSuccessCallback.bind(this, 'media set-volume done'),
       onError);
     currentVolume = level;
-  }
-  else {
+  } else {
     session.setReceiverMuted(true,
       mediaCommandSuccessCallback.bind(this, 'media set-volume done'),
       onError);
@@ -427,18 +411,17 @@ function setReceiverVolume(level, mute) {
  * @param {DOM Object} cb A checkbox element
  */
 function muteMedia(cb) {
-  if( cb.checked == true ) {
+  if (cb.checked == true) {
     //document.getElementById('muteText').innerHTML = 'Unmute media';
     //setMediaVolume(currentVolume, true);
     setReceiverVolume(currentVolume, true);
-    
-  }
-  else {
+
+  } else {
     //document.getElementById('muteText').innerHTML = 'Mute media';
     //setMediaVolume(currentVolume, false);
     setReceiverVolume(currentVolume, false);
-    
-  } 
+
+  }
 }
 
 /**
@@ -463,8 +446,10 @@ function seekMedia(pos) {
  */
 function onSeekSuccess(info) {
   console.log(info);
-  
-  setTimeout(function(){progressFlag = 1},1500);
+
+  setTimeout(function() {
+    progressFlag = 1
+  }, 1500);
 }
 
 /**
@@ -474,9 +459,5 @@ function onSeekSuccess(info) {
  */
 function mediaCommandSuccessCallback(info) {
   console.log(info);
-  
+
 }
-
-
-
-
